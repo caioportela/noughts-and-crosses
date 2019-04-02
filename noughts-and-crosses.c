@@ -1,14 +1,16 @@
+#ifdef _WIN32
+	#include <conio.h>
+	#include <windows.h>
+	#define CLEAR() system("cls")
+	#define COORD coord = {0, 0};
+	#define GOTOXY(x,y) { coord.X = x; coord.Y = y; SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord); }
+#else
+	#define GOTOXY(x,y) printf("%c[%d;%df",0x1B,y,x)
+	#define CLEAR() system("clear")
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
-#include <windows.h>
-
-COORD coord = {0, 0};
-void gotoxy(int x, int y) {
-	coord.X = x;
-	coord.Y = y;
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
 
 void leave_mark(char mk, int pos) {
 	/* That's gonna leave a mark */
@@ -32,7 +34,7 @@ void leave_mark(char mk, int pos) {
 		}
 	}
 
-	gotoxy(x, y);
+	GOTOXY(x, y);
 	printf("%c", mk);
 }
 
@@ -41,13 +43,13 @@ int board[10] = {2,2,2,2,2,2,2,2,2,2};
 void draw_board() {
 	/* Make the board */
 	for(int i = 9; i < 17; i++) {
-		gotoxy(31, i);
+		GOTOXY(31, i);
 		printf("|       |");
 	}
 
-	gotoxy(24, 11);
+	GOTOXY(24, 11);
 	printf("=======================");
-	gotoxy(24, 14);
+	GOTOXY(24, 14);
 	printf("=======================");
 
 	for(int i = 1; i < 10; i++) {
@@ -62,9 +64,9 @@ int turn = 1;
 
 void check_draw() {
 	if(turn > 9) {
-		gotoxy(30,20);
+		GOTOXY(30,20);
 		printf("Game Draw");
-		getch();
+		// getch();
 		exit(0);
 	}
 	return;
@@ -125,7 +127,7 @@ int posswin(int player) {
 		if(board[5] == 2)
 			return 5;
 		if(board[7] == 2)
-			return 7; 
+			return 7;
 	}
 
 	return 0;
@@ -176,7 +178,7 @@ void player_first() {
 
 	check_draw();
 	draw_board();
-	gotoxy(30, 18);
+	GOTOXY(30, 18);
 	printf("Your Turn: ");
 	scanf("%d", &pos);
 
@@ -186,10 +188,10 @@ void player_first() {
 	if(pos == posswin(player)) {
 		go(pos);
 		draw_board();
-		gotoxy(30, 20);
+		GOTOXY(30, 20);
 
 		printf("Player Wins");
-		getch();
+		// getch();
 
 		return;
 	}
@@ -216,18 +218,19 @@ void start_game() {
 	draw_board();
 
 	if(flag) {
-		gotoxy(30, 20);
+		GOTOXY(30, 20);
 		printf("Computer Wins");
-		getch();
-	} else 
+		// getch();
+	} else
 		player_first();
 }
 
 int main() {
 	int menu;
-	
+
 	menu:
-	system("cls");
+	// CLEAR();
+	system("clear");
 	/*------------------------------- Main Menu -------------------------------*/
 	printf("\n\t\t\t\t  MENU");
 	printf("\n\t\t\t========================");
@@ -242,7 +245,7 @@ int main() {
 		case 1:
 			player = 1;
 			comp = 0;
-			system("cls");
+			CLEAR();
 			printf("\n\n\n\n\n\n\t\t\t     Playing with X");
 			player_first();
 			break;
@@ -250,14 +253,14 @@ int main() {
 		case 2:
 			player = 0;
 			comp = 1;
-			system("cls");
+			CLEAR();
 			printf("\n\n\n\n\n\n\t\t\t     Playing with O");
 			start_game();
 			break;
 
 		case 3:
 			return 0;
-		
+
 		default:
 			goto menu;
 	}
